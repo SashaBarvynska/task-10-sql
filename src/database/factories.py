@@ -1,7 +1,7 @@
 import factory
 from faker import Faker
 
-from src.database.models import CourseModel, GroupModel, StudentModel
+from .models import CourseModel, GroupModel, StudentModel
 
 list_course = [
         'Mathematics', 'Biology', 'Chemistry', 'Physics', 'Computer Science',

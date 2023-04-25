@@ -157,7 +157,7 @@ python-versions = ">=3.7"
 
 [[package]]
 name = "peewee"
-version = "3.16.0"
+version = "3.16.1"
 description = "a little orm"
 category = "main"
 optional = false
@@ -289,7 +289,7 @@ watchdog = ["watchdog"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.10"
-content-hash = "3bed43ea9c106596790da459eb6191b8fb829299aa421daeb38fa0253a40eaf9"
+content-hash = "f3070b638da35ce99651b5ce639e24df3c35b476266e08a83006ef8c30a049c8"
 
 [metadata.files]
 aniso8601 = [
@@ -528,7 +528,7 @@ markupsafe = [
     {file = "MarkupSafe-2.1.2.tar.gz", hash = "sha256:abcabc8c2b26036d62d4c746381a6f7cf60aafcc653198ad678306986b09450d"},
 ]
 peewee = [
-    {file = "peewee-3.16.0.tar.gz", hash = "sha256:1800c0a04962ee99d161c07f5a12fc49549caf5cfcda426a9103e34e37f854ba"},
+    {file = "peewee-3.16.1.tar.gz", hash = "sha256:03ba808b96bb3366fc7e949d669804d79059e01d472f0dfaddc2da5fa1614ee7"},
 ]
 psycopg2 = [
     {file = "psycopg2-2.9.6-cp310-cp310-win32.whl", hash = "sha256:f7a7a5ee78ba7dc74265ba69e010ae89dae635eea0e97b055fb641a01a31d2b1"},
