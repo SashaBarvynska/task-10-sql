@@ -24,7 +24,7 @@ def assing_students_to_groups(session: Session_type) -> None:
         students_in_current_group = random.randint(10, 31)
         if (sum(students_in_groups) + students_in_current_group) <= students_count:
             student_ids = session.query(StudentModel.id).filter(
-                StudentModel.group_id == None  # noqa: E711
+                StudentModel.group_id.is_(None)  # noqa: E711
                 ).limit(
                     students_in_current_group
                     )
@@ -53,7 +53,7 @@ def assign_random_courses(session: Session_type) -> None:
     logging.info('Randomly assigned from 1 to 3 courses for each student in table"s student_course.')
 
 
-def insert_data_in_db() -> None:
+def insert_data() -> None:
     with get_session() as session:
         groups = GroupFactory.create_batch(10)
         logging.info('Randomly created 10 groups in database')

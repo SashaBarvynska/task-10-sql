@@ -4,8 +4,6 @@ from sqlalchemy.orm import relationship
 
 from src.database.connection import Base
 
-# from sqlalchemy.orm import relationship, backref
-
 
 class GroupModel(Base):
     __tablename__ = "groups"

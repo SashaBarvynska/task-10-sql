@@ -9,8 +9,6 @@ list_course = [
     ]
 
 fake = Faker()
-list_first_name = [fake.first_name() for _ in range(20)]
-list_last_name = [fake.last_name() for _ in range(20)]
 
 
 class GroupFactory(factory.Factory):
@@ -28,5 +26,5 @@ class CreateTestCourse(factory.Factory):
 class CreateTestStudent(factory.Factory):
     class Meta:
         model = StudentModel
-    first_name = factory.Sequence(lambda n: fake.random_element(list_first_name))
-    last_name = factory.Sequence(lambda n: fake.random_element(list_last_name))
+    first_name = factory.Sequence(lambda n: fake.first_name())
+    last_name = factory.Sequence(lambda n: fake.last_name())

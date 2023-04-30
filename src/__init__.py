@@ -1,4 +1,4 @@
-from .database import (CourseModel, GroupModel, GroupRepository,
+from .database import (MODELS, CourseModel, GroupModel, GroupRepository,
                        StudentCourseModel, StudentCourseRepository,
                        StudentModel, StudentRepository, create_tables, db,
-                       get_session, insert_data_in_db)
+                       get_session, insert_data)

@@ -1,6 +1,7 @@
 from contextlib import contextmanager
 
 from sqlalchemy import create_engine
+from sqlalchemy.exc import DatabaseError
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
@@ -17,5 +18,7 @@ def get_session():
     try:
         yield session
         session.commit()
+    except DatabaseError:
+        session.rollback()
     finally:
         session.close()
