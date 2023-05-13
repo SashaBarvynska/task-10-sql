@@ -14,12 +14,12 @@ class StudentCourseRepository(BaseReporistory):
     def add_course_id(student_id: int, id: int) -> StudentCourseModel:
         return StudentCourseModel(student_id=student_id, course_id=id)
 
-    def get_an_existing_course_from_the_student(self, data: GetIdsStudentAndCourse) -> List[(int)]:
+    def get_an_existing_course_from_the_student(self, data: GetIdsStudentAndCourse) -> List[int]:
         return self.session.query(CourseModel.id).join(StudentCourseModel).join(StudentModel).filter(
             StudentModel.id == data['student_id'], CourseModel.id.in_(data['course_id'])
             ).all()
 
-    def get_course_to_student_by_id(self, course: int, id: int) -> (StudentCourseModel | None):
+    def get_course_to_student_by_id(self, course: int, id: int) -> StudentCourseModel | None:
         return self.session.query(StudentCourseModel).join(CourseModel).join(StudentModel).filter(
             StudentModel.id == id, CourseModel.id == course
             ).first()

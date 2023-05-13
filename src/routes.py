@@ -28,7 +28,7 @@ class Group:
 def add_student() -> wrappers.Response:
     with get_session() as session:
         data = request.get_json()
-        new_student = StudentRepository(session).create_student(data)
+        new_student = StudentRepository(session).create_student(**data)
         student = Student(new_student.id, new_student.first_name, new_student.last_name)
         return asdict(student), HTTPStatus.OK
 

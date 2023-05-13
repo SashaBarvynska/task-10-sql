@@ -1,0 +1,26 @@
+version: '3'
+
+services:
+  main_db:
+    image: postgres:13-alpine
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 0672934823a
+      POSTGRES_DB: postgres
+
+  test_db:
+    image: postgres:13-alpine
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 0672934823a
+      POSTGRES_DB: postgres
+
+  server:
+    build: .
+    ports:
+      - "5000:5000"
+    environment:
+      FLASK_APP: app.py
+      FLASK_ENV: production
+      DB_HOST: main_db
+      DB_NAME: my_database
