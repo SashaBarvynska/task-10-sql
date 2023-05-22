@@ -1,4 +1,5 @@
 import pytest
+
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
@@ -24,7 +25,7 @@ Base_test = declarative_base()
 
 @pytest.fixture(scope='session')
 def test_db(app):
-    test_db = create_engine('postgresql://postgres:0672934823a@localhost:5432/test_db')
+    test_db = create_engine(TestConfig.TEST_DATABASE)
     Session = sessionmaker(bind=test_db)
     session = Session()
     session.query(StudentModel)

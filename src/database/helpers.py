@@ -4,8 +4,9 @@ from sqlalchemy.orm import Session as Session_type
 
 from logging_config import logging
 from src.database.connection import Base, db, get_session
-from src.database.models import (CourseModel, GroupModel, StudentCourseModel,
-                                 StudentModel)
+from src.database.models import (
+    CourseModel, GroupModel, StudentCourseModel, StudentModel,
+)
 
 from .factories import CreateTestCourse, CreateTestStudent, GroupFactory
 

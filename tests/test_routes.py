@@ -1,6 +1,7 @@
 import json
 
 import pytest
+
 from flask import Response
 
 
@@ -52,6 +53,5 @@ def test_get_courses(course, result, client):
 
 def test_handle_exception(client):
     response: Response = client.get("/students/&^%SashaBarvynska474")
-    print("response: ", type(response.data), response.data.rstrip(), response.data.strip())
     assert response.status_code == 404
     assert response.data.replace(b'\n  ', b'').replace(b'\n', b'') == b'{"message": "Page Not Found"}'

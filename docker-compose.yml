@@ -1,19 +1,35 @@
 version: '3'
 
+
 services:
   main_db:
     image: postgres:13-alpine
+    restart: always
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: 0672934823a
       POSTGRES_DB: postgres
+    ports:
+      - 5432
+    volumes:
+      - /my/data:/var/lib/postgresql
+    networks:
+      - my-network
+
 
   test_db:
     image: postgres:13-alpine
+    restart: always
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: 0672934823a
       POSTGRES_DB: postgres
+    ports:
+      - 5432
+    volumes:
+      - /my/data:/var/lib/postgresql
+    networks:
+      - my-network
 
   server:
     build: .
@@ -24,3 +40,11 @@ services:
       FLASK_ENV: production
       DB_HOST: main_db
       DB_NAME: my_database
+    networks:
+      - my-network
+    depends_on:
+      - main_db
+      - test_db
+
+networks:
+  my-network:
