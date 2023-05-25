@@ -1,4 +1,4 @@
-from dataclasses import asdict, dataclass
+from dataclasses import asdict
 from http import HTTPStatus
 
 import jsonpickle
@@ -8,19 +8,7 @@ from flask import request, wrappers
 
 from src import GroupRepository, StudentCourseRepository, StudentRepository, get_session
 from src.app import app
-
-
-@dataclass
-class Student:
-    id: int
-    first_name: str
-    last_name: str
-
-
-@dataclass
-class Group:
-    id: int
-    name: str
+from src.dataclasses import Group, Student
 
 
 # Add new student

@@ -16,8 +16,8 @@ def create_tables_in_db() -> None:
 @run_db.command()
 def insert_data_in_db() -> None:
     insert_data()
+
     logging.info('File execution is finished.')
 
 
-if __name__ == '__main__':
-    run_db()
+run_db()

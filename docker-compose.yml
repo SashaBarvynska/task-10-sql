@@ -10,7 +10,7 @@ services:
       POSTGRES_PASSWORD: 0672934823a
       POSTGRES_DB: postgres
     ports:
-      - 5432
+      - 8002:5432
     volumes:
       - /my/data:/var/lib/postgresql
     networks:
@@ -25,7 +25,7 @@ services:
       POSTGRES_PASSWORD: 0672934823a
       POSTGRES_DB: postgres
     ports:
-      - 5432
+      - 8001:5432
     volumes:
       - /my/data:/var/lib/postgresql
     networks:
@@ -34,7 +34,7 @@ services:
   server:
     build: .
     ports:
-      - "5000:5000"
+      - "8000:5000"
     environment:
       FLASK_APP: app.py
       FLASK_ENV: production

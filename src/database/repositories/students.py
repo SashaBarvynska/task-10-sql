@@ -23,7 +23,7 @@ class StudentRepository(BaseReporistory):
     def get_student_by_id(self, student_id: int) -> StudentModel or None:
         return self.session.query(StudentModel).filter(StudentModel.id == student_id).first()
 
-    def delete_student_by_id(self, student_id: int):
+    def delete_student_by_id(self, student_id: int) -> None:
         self.session.query(StudentModel).filter(StudentModel.id == student_id).delete()
 
     def get_students_related_to_course(self, name_course: str) -> List[StudentModel]:
