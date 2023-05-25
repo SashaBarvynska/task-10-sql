@@ -3,24 +3,19 @@ FROM python:3.10.0-slim-buster
 
 # set work directory
 WORKDIR /app
-COPY pyproject.toml /app/
-
-# install dependencies
-RUN pip install poetry
-
 # helping libraries for install and run psycopg2
 RUN apt-get update \
-    && apt-get -y install libpq-dev gcc
+    && apt-get -y install libpq-dev gcc \
+    && curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python -
 
-RUN poetry install
+ENV PATH="/root/.poetry/bin:${PATH}"    
 
-# copy tests
-COPY tests /app/tests
-COPY config.py /app/config.py
+# install dependencies
+COPY pyproject.toml poetry.lock /app/
 
-RUN pytest tests/
-# copy project
-COPY src /app/src
+RUN poetry install --no-root --no-dev
+
+COPY . /app/
 
 # start the server
-CMD ["python", "-m", "flask", "run", "--host=0.0.0.0"]
+ENTRYPOINT ["python", "main.py"]
