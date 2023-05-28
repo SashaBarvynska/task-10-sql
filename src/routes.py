@@ -1,6 +1,6 @@
-from dataclasses import asdict, dataclass
+from dataclasses import asdict
 from http import HTTPStatus
-
+from src.dataclass import Student, Group
 import jsonpickle
 
 from flasgger import swag_from
@@ -14,19 +14,6 @@ from src import (
     StudentModel,
 )
 from src.app import app
-
-
-@dataclass
-class Student:
-    id: int
-    first_name: str
-    last_name: str
-
-
-@dataclass
-class Group:
-    id: int
-    name: str
 
 
 # Add new student
