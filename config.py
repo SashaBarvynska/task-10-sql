@@ -1,11 +1,16 @@
 import os
+from dotenv.main import load_dotenv
+
+load_dotenv()
 
 
 class Config:
-    DATABASE = os.environ.get('DATABASE', 'postgresql://postgres:0672934823a@localhost:5432/postgres')
-    DEBUG = os.environ.get('debug', True)
+    DATABASE = os.environ["DATABASE"]
+    PORT = os.environ["APP_PORT"]
+    HOST = os.environ["APP_HOST"]
+    DEBUG = os.environ.get("debug", True)
 
 
 class TestConfig(Config):
-    TESTING = os.environ.get('TESTING', True)
-    TEST_DATABASE = os.environ.get('DATABASE', 'postgresql://postgres:0672934823a@localhost:5432/postgres')
+    TEST_DATABASE = os.environ["TEST_DATABASE"]
+    TESTING = os.environ.get("debug", True)

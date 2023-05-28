@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 
 
-class BaseReporistory:
+class BaseRepository:
     def __init__(self, session: Session):
         self.session: Session = session

@@ -1,50 +1,38 @@
 version: '3'
 
-
 services:
-  main_db:
-    image: postgres:13-alpine
+  web:
+    container_name: web
     restart: always
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: 0672934823a
-      POSTGRES_DB: postgres
-    ports:
-      - 5432
-    volumes:
-      - /my/data:/var/lib/postgresql
-    networks:
-      - my-network
-
-
-  test_db:
-    image: postgres:13-alpine
-    restart: always
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: 0672934823a
-      POSTGRES_DB: postgres
-    ports:
-      - 5432
-    volumes:
-      - /my/data:/var/lib/postgresql
-    networks:
-      - my-network
-
-  server:
     build: .
-    ports:
-      - "5000:5000"
-    environment:
-      FLASK_APP: app.py
-      FLASK_ENV: production
-      DB_HOST: main_db
-      DB_NAME: my_database
+    command: bash -c "python insert_data_to_db.py create-tables-in-db && python insert_data_to_db.py insert-data-in-db && python main.py run -h 0.0.0.0"
     networks:
       - my-network
+    ports:
+      - ${APP_PORT}:${APP_PORT}
+    volumes:
+      - .:/app
     depends_on:
       - main_db
-      - test_db
+
+  main_db:
+    container_name: main_db
+    restart: always
+    image: postgres:13-alpine
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    ports:
+      - ${POSTGRES_PORT}:${POSTGRES_PORT}
+    networks:
+      - my-network
+    volumes:
+      - ./postgres-data/postgres:/var/lib/postgresql/data
+
+volumes:
+  postgres-data: {}
+
 
 networks:
   my-network:

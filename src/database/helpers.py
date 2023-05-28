@@ -5,7 +5,10 @@ from sqlalchemy.orm import Session as Session_type
 from logging_config import logging
 from src.database.connection import Base, db, get_session
 from src.database.models import (
-    CourseModel, GroupModel, StudentCourseModel, StudentModel,
+    CourseModel,
+    GroupModel,
+    StudentCourseModel,
+    StudentModel,
 )
 
 from .factories import CreateTestCourse, CreateTestStudent, GroupFactory
@@ -14,27 +17,25 @@ from .factories import CreateTestCourse, CreateTestStudent, GroupFactory
 def create_tables() -> None:
     Base.metadata.drop_all(bind=db)
     Base.metadata.create_all(bind=db)
-    logging.info('created table in database.')
+    logging.info("created table in database.")
 
 
-def assing_students_to_groups(session: Session_type) -> None:
+def assign_students_to_groups(session: Session_type) -> None:
     students_count = session.query(StudentModel).count()
     groups_count = session.query(GroupModel).count()
     students_in_groups = []
     for group_id in range(1, groups_count + 1):
         students_in_current_group = random.randint(10, 31)
         if (sum(students_in_groups) + students_in_current_group) <= students_count:
-            student_ids = session.query(StudentModel.id).filter(
-                StudentModel.group_id.is_(None)  # noqa: E711
-                ).limit(
-                    students_in_current_group
-                    )
+            student_ids = (
+                session.query(StudentModel.id)
+                .filter(StudentModel.group_id.is_(None))  # noqa: E711
+                .limit(students_in_current_group)
+            )
 
-            session.query(StudentModel).filter(
-                StudentModel.id.in_(student_ids)
-                ).update(
-                    {StudentModel.group_id: group_id}
-                    )
+            session.query(StudentModel).filter(StudentModel.id.in_(student_ids)).update(
+                {StudentModel.group_id: group_id}
+            )
 
             students_in_groups.append(students_in_current_group)
     logging.info('Randomly assigned students to groups in table"s students')
@@ -51,20 +52,22 @@ def assign_random_courses(session: Session_type) -> None:
             obj = StudentCourseModel(student_id=student.id, course_id=course.id)
             list_ids.append(obj)
     session.add_all(list_ids)
-    logging.info('Randomly assigned from 1 to 3 courses for each student in table"s student_course.')
+    logging.info(
+        'Randomly assigned from 1 to 3 courses for each student in table"s student_course.'
+    )
 
 
 def insert_data() -> None:
     with get_session() as session:
         groups = GroupFactory.create_batch(10)
-        logging.info('Randomly created 10 groups in database')
+        logging.info("Randomly created 10 groups in database")
         courses = CreateTestCourse.create_batch(10)
-        logging.info('Randomly created 10 courses in database')
+        logging.info("Randomly created 10 courses in database")
         students = CreateTestStudent.create_batch(200)
-        logging.info('Randomly created 200 students in database')
+        logging.info("Randomly created 200 students in database")
         session.bulk_save_objects(groups)
         session.bulk_save_objects(courses)
         session.bulk_save_objects(students)
-        assing_students_to_groups(session)
+        assign_students_to_groups(session)
         assign_random_courses(session)
-    logging.info('data added in database.')
+    logging.info("data added in database.")

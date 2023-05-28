@@ -9,15 +9,14 @@ run_db = typer.Typer()
 
 @run_db.command()
 def create_tables_in_db() -> None:
-    logging.info('Starting file execution...')
+    logging.info("Starting file execution...")
     create_tables()
 
 
 @run_db.command()
 def insert_data_in_db() -> None:
     insert_data()
-    logging.info('File execution is finished.')
+    logging.info("File execution is finished.")
 
 
-if __name__ == '__main__':
-    run_db()
+run_db()
