@@ -1,6 +1,6 @@
 from typing import List, TypedDict
 
-from src.database import CourseModel, StudentCourseModel, StudentModel
+from src.database.models import CourseModel, StudentCourseModel, StudentModel
 
 from .base_repository import BaseRepository
 

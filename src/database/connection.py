@@ -1,21 +1,15 @@
 from contextlib import contextmanager
-
-from sqlalchemy import create_engine
 from sqlalchemy.exc import DatabaseError
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
-
-from config import Config
+from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy.orm import Session
 
 
-db = create_engine(Config.DATABASE)
-Base = declarative_base()
-Session = sessionmaker(bind=db)
+db = SQLAlchemy()
 
 
 @contextmanager
 def get_session():
-    session = Session()
+    session: Session = db.session
     try:
         yield session
         session.commit()

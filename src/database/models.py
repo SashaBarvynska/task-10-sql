@@ -2,36 +2,42 @@ from peewee import Model
 from sqlalchemy import Column, ForeignKey, Integer, String
 from sqlalchemy.orm import relationship
 
-from src.database.connection import Base
+from src.database.connection import db
 
 
-class GroupModel(Base):
+class GroupModel(db.Model):
     __tablename__ = "groups"
-    id = Column(Integer, primary_key=True)
-    name = Column(String)
+    id = db.Column(Integer, primary_key=True)
+    name = db.Column(String)
 
 
-class StudentModel(Base):
+class StudentModel(db.Model):
     __tablename__ = "students"
-    id = Column(Integer, primary_key=True)
-    first_name = Column(String, nullable=False)
-    last_name = Column(String, nullable=False)
-    group_id = Column(Integer, ForeignKey('groups.id'))
-    group = relationship("GroupModel", backref="students")
+    id = db.Column(Integer, primary_key=True)
+    first_name = db.Column(String, nullable=False)
+    last_name = db.Column(String, nullable=False)
+    group_id = db.Column(Integer, ForeignKey("groups.id"))
+    group = db.relationship("GroupModel", backref="students")
 
 
-class CourseModel(Base):
+class CourseModel(db.Model):
     __tablename__ = "courses"
-    id = Column(Integer, primary_key=True)
-    name = Column(String)
-    description = Column(String)
-    student = relationship("StudentModel", secondary="student_course", backref="courses")
+    id = db.Column(Integer, primary_key=True)
+    name = db.Column(String)
+    description = db.Column(String)
+    student = db.relationship(
+        "StudentModel", secondary="student_course", backref="courses"
+    )
 
 
-class StudentCourseModel(Base):
-    __tablename__ = 'student_course'
-    student_id = Column(Integer, ForeignKey('students.id', ondelete='CASCADE'), primary_key=True)
-    course_id = (Column(Integer, ForeignKey('courses.id', ondelete='CASCADE'), primary_key=True))
+class StudentCourseModel(db.Model):
+    __tablename__ = "student_course"
+    student_id = db.Column(
+        Integer, ForeignKey("students.id", ondelete="CASCADE"), primary_key=True
+    )
+    course_id = db.Column(
+        Integer, ForeignKey("courses.id", ondelete="CASCADE"), primary_key=True
+    )
 
 
 MODELS: list[Model] = [GroupModel, StudentModel, CourseModel, StudentCourseModel]

@@ -1,6 +1,6 @@
 from typing import List, TypedDict
 
-from src.database import CourseModel, StudentCourseModel, StudentModel
+from src.database.models import CourseModel, StudentCourseModel, StudentModel
 
 from .base_repository import BaseRepository
 
@@ -11,7 +11,7 @@ class CreateStudent(TypedDict):
 
 
 class StudentRepository(BaseRepository):
-    def create_student(self, **data: CreateStudent) -> StudentModel:
+    def create_student(self, data: CreateStudent) -> StudentModel:
         student = StudentModel(
             first_name=data["first_name"],
             last_name=data["last_name"],

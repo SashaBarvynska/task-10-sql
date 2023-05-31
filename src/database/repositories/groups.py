@@ -1,6 +1,6 @@
 from sqlalchemy import func
 
-from src.database import GroupModel, StudentModel
+from src.database.models import GroupModel, StudentModel
 
 from .base_repository import BaseRepository
 

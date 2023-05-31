@@ -3,21 +3,25 @@ import random
 from sqlalchemy.orm import Session as Session_type
 
 from logging_config import logging
-from src.database.connection import Base, db, get_session
+from src.database.connection import db, get_session
 from src.database.models import (
     CourseModel,
     GroupModel,
     StudentCourseModel,
     StudentModel,
 )
-
+from src.app import create_app
 from .factories import CreateTestCourse, CreateTestStudent, GroupFactory
+from config import Config
+
+app = create_app(Config)
 
 
 def create_tables() -> None:
-    Base.metadata.drop_all(bind=db)
-    Base.metadata.create_all(bind=db)
-    logging.info("created table in database.")
+    with app.app_context():
+        db.drop_all()
+        db.create_all()
+        logging.info("created table in database.")
 
 
 def assign_students_to_groups(session: Session_type) -> None:
@@ -58,16 +62,17 @@ def assign_random_courses(session: Session_type) -> None:
 
 
 def insert_data() -> None:
-    with get_session() as session:
-        groups = GroupFactory.create_batch(10)
-        logging.info("Randomly created 10 groups in database")
-        courses = CreateTestCourse.create_batch(10)
-        logging.info("Randomly created 10 courses in database")
-        students = CreateTestStudent.create_batch(200)
-        logging.info("Randomly created 200 students in database")
-        session.bulk_save_objects(groups)
-        session.bulk_save_objects(courses)
-        session.bulk_save_objects(students)
-        assign_students_to_groups(session)
-        assign_random_courses(session)
-    logging.info("data added in database.")
+    with app.app_context():
+        with get_session() as session:
+            groups = GroupFactory.create_batch(10)
+            logging.info("Randomly created 10 groups in database")
+            courses = CreateTestCourse.create_batch(10)
+            logging.info("Randomly created 10 courses in database")
+            students = CreateTestStudent.create_batch(200)
+            logging.info("Randomly created 200 students in database")
+            session.bulk_save_objects(groups)
+            session.bulk_save_objects(courses)
+            session.bulk_save_objects(students)
+            assign_students_to_groups(session)
+            assign_random_courses(session)
+        logging.info("data added in database.")

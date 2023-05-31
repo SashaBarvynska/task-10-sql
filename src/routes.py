@@ -3,22 +3,22 @@ from http import HTTPStatus
 from src.dataclass import Student, Group
 import jsonpickle
 
-from flasgger import swag_from
-from flask import request, wrappers
+# from flasgger import swag_from
+from flask import request, wrappers, current_app, Blueprint, render_template
 
-from src import (
-    GroupRepository,
-    StudentCourseRepository,
+from src.database.repositories import (
     StudentRepository,
-    get_session,
-    StudentModel,
+    StudentCourseRepository,
+    GroupRepository,
 )
-from src.app import app
+from src.database.connection import get_session
+
+routes = Blueprint("routes", __name__)
 
 
 # Add new student
-@app.route("/students", methods=["POST"])
-@swag_from("swagger/students.yml")
+@routes.route("/students", methods=["POST"])
+# @swag_from("swagger/students.yml")
 def add_student() -> wrappers.Response:
     with get_session() as session:
         data = request.get_json()
@@ -28,8 +28,8 @@ def add_student() -> wrappers.Response:
 
 
 # Delete student by STUDENT_ID
-@app.route("/students/<int:student_id>", methods=["DELETE"])
-@swag_from("swagger/students.yml")
+@routes.route("/students/<int:student_id>", methods=["DELETE"])
+# @swag_from("swagger/students.yml")
 def delete_student(student_id: int) -> wrappers.Response:
     with get_session() as session:
         student_repository = StudentRepository(session)
@@ -46,8 +46,8 @@ def delete_student(student_id: int) -> wrappers.Response:
 
 
 # Find all students related to the course with a given name.
-@app.route("/students", methods=["GET"])
-@swag_from("swagger/students.yml")
+@routes.route("/students", methods=["GET"])
+# @swag_from("swagger/students.yml")
 def get_courses():
     with get_session() as session:
         course = request.args.get("course")
@@ -63,9 +63,9 @@ def get_courses():
         return jsonpickle.encode(dict_students), HTTPStatus.OK
 
 
-# Add a student to the course (from a list)
-@app.route("/students/add_course", methods=["POST"])
-@swag_from("swagger/courses.yml")
+# # Add a student to the course (from a list)
+@routes.route("/students/add_course", methods=["POST"])
+# @swag_from("swagger/courses.yml")
 def add_student_to_course() -> wrappers.Response:
     with get_session() as session:
         data = request.get_json()
@@ -84,8 +84,8 @@ def add_student_to_course() -> wrappers.Response:
 
 
 # Remove the student from one of his or her courses
-@app.route("/students/<int:student_id>/courses", methods=["DELETE"])
-@swag_from("swagger/courses.yml")
+@routes.route("/students/<int:student_id>/courses", methods=["DELETE"])
+# @swag_from("swagger/courses.yml")
 def delete_course(student_id: int) -> wrappers.Response:
     with get_session() as session:
         course_id = request.args.get("course")
@@ -105,8 +105,8 @@ def delete_course(student_id: int) -> wrappers.Response:
 
 
 # Find all groups with less or equals student count.
-@app.route("/groups", methods=["GET"])
-@swag_from("swagger/groups.yml")
+@routes.route("/groups", methods=["GET"])
+# @swag_from("swagger/groups.yml")
 def get_groups() -> wrappers.Response:
     with get_session() as session:
         max_students = request.args.get("max_students")
@@ -120,8 +120,3 @@ def get_groups() -> wrappers.Response:
             )
         )
         return jsonpickle.encode(dict_students), HTTPStatus.OK
-
-
-@app.errorhandler(404)
-def handle_exception(e) -> wrappers.Response:
-    return {"message": "Page Not Found."}, HTTPStatus.NOT_FOUND

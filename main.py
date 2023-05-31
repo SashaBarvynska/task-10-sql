@@ -1,8 +1,7 @@
 import src.routes  # NOQA
-from config import Config
-from src.app import app
+from config import Config, TestConfig
+from src.app import create_app
 
 
 if __name__ == "__main__":
-    app.config.from_object(Config)
-    app.run(host=Config.HOST, port=Config.PORT, debug=True)
+    create_app(Config).run(host=Config.HOST, port=Config.PORT, debug=True)

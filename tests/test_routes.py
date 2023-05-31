@@ -1,57 +1,89 @@
 import json
-
+from flask import Response
 import pytest
 
-from flask import Response
 
-
-test_student = b'{"first_name": "Michael","id": 233,"last_name": "Bondarenko"}'
+test_student = b'{"first_name": "Sasha","id": 1,"last_name": "Barvynska"}'
 
 
 def test_add_student(client):
     response = client.post(
-            '/students',
-            data=json.dumps(dict(
-                first_name='Michael',
-                last_name='Bondarenko'
-            )),
-            content_type='application/json',
-        )
+        "/students",
+        data=json.dumps(dict(first_name="Sasha", last_name="Barvynska")),
+        content_type="application/json",
+    )
     assert response.status_code == 200
-    assert test_student == response.data.replace(b'\n  ', b'').replace(b'\n', b'')
+    assert response.data.replace(b"\n  ", b"").replace(b"\n", b"") == test_student
 
 
-@pytest.mark.parametrize("id, result",  [
-    (11, b'{"message": "Student by 11 has been deleted."}'),
-    (12, b'{"message": "Student by 12 has been deleted."}'),
-    ])
-def test_delete_student_successfully(id, result, client):
-    response = client.delete(f'/students/{id}')
+def test_delete_student_successfully(client):
+    response = client.delete("/students/2")
     assert response.status_code == 200
-    assert result == response.data.replace(b'\n  ', b'').replace(b'\n', b'')
 
 
-@pytest.mark.parametrize("id, result",  [
-    (1, b'{"error": "Student by 1 not found."}'),
-    (3, b'{"error": "Student by 3 not found."}'),
-    ])
+@pytest.mark.parametrize(
+    "id, result",
+    [
+        (5, b'{"error": "Student by 5 not found."}'),
+        (3, b'{"error": "Student by 3 not found."}'),
+    ],
+)
 def test_delete_student_error(id, result, client):
-    response = client.delete(f'/students/{id}')
+    response = client.delete(f"/students/{id}")
     assert response.status_code == 404
-    assert result == response.data.replace(b'\n  ', b'').replace(b'\n', b'')
+    assert result == response.data.replace(b"\n  ", b"").replace(b"\n", b"")
 
 
-@pytest.mark.parametrize("course, result",  [
-    ("Biology", b'[{"first_name": "Russell", "id": 180, "last_name": "Howe"}]'),
-    ("History", b'[{"id": 177, "first_name": "Daniel", "last_name": "Osborn"}]'),
-    ])
-def test_get_courses(course, result, client):
-    response: Response = client.get(f"/students?course={course}")
+def test_get_courses(client):
+    response: Response = client.get("/students?course=Biology")
     assert response.status_code == 200
-    assert result == response.content_encoding
+    assert response.data == b'[{"id": 2, "first_name": "John", "last_name": "Doe"}]'
+
+
+def test_add_student_to_course_error(client):
+    response: Response = client.post(
+        "/students/add_course",
+        data=json.dumps(dict(student_id=2, course_id=[1])),
+        content_type="application/json",
+    )
+    assert response.status_code == 404
+    assert (
+        response.data == b'{\n  "error": "This course by id [1] already exists."\n}\n'
+    )
+
+
+def test_add_student_to_course(client):
+    response: Response = client.post(
+        "/students/add_course",
+        data=json.dumps(dict(student_id=2, course_id=[2])),
+        content_type="application/json",
+    )
+    assert response.status_code == 200
+    assert response.data == b'{\n  "message": "Course was added successfully."\n}\n'
+
+
+def test_delete_course_error(client):
+    response: Response = client.delete("/students/2/courses?course=2")
+    assert response.status_code == 404
+    assert response.data == b'{\n  "error": "Course by id 2 not found."\n}\n'
+
+
+def test_delete_course(client):
+    response: Response = client.delete("/students/2/courses?course=1")
+    assert response.status_code == 200
+    assert response.data == b'{\n  "message": "Course by id 1 has been deleted."\n}\n'
+
+
+def test_get_groups(client):
+    response: Response = client.get("/groups?max_students=2")
+    assert response.status_code == 200
+    assert response.data == b'[{"id": 1, "name": "AA"}]'
 
 
 def test_handle_exception(client):
-    response: Response = client.get("/students/&^%SashaBarvynska474")
+    response: Response = client.get("/dbfdbn")
     assert response.status_code == 404
-    assert response.data.replace(b'\n  ', b'').replace(b'\n', b'') == b'{"message": "Page Not Found"}'
+    assert (
+        response.data.replace(b"\n  ", b"").replace(b"\n", b"")
+        == b'{"message": "Page Not Found"}'
+    )
