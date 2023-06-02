@@ -3,7 +3,7 @@ from http import HTTPStatus
 from src.dataclass import Student, Group
 import jsonpickle
 
-# from flasgger import swag_from
+from flasgger import swag_from
 from flask import request, wrappers, current_app, Blueprint, render_template
 
 from src.database.repositories import (
@@ -18,7 +18,7 @@ routes = Blueprint("routes", __name__)
 
 # Add new student
 @routes.route("/students", methods=["POST"])
-# @swag_from("swagger/students.yml")
+@swag_from("swagger/students.yml")
 def add_student() -> wrappers.Response:
     with get_session() as session:
         data = request.get_json()
@@ -29,7 +29,7 @@ def add_student() -> wrappers.Response:
 
 # Delete student by STUDENT_ID
 @routes.route("/students/<int:student_id>", methods=["DELETE"])
-# @swag_from("swagger/students.yml")
+@swag_from("swagger/students.yml")
 def delete_student(student_id: int) -> wrappers.Response:
     with get_session() as session:
         student_repository = StudentRepository(session)
@@ -47,7 +47,7 @@ def delete_student(student_id: int) -> wrappers.Response:
 
 # Find all students related to the course with a given name.
 @routes.route("/students", methods=["GET"])
-# @swag_from("swagger/students.yml")
+@swag_from("swagger/students.yml")
 def get_courses():
     with get_session() as session:
         course = request.args.get("course")
@@ -65,7 +65,7 @@ def get_courses():
 
 # # Add a student to the course (from a list)
 @routes.route("/students/add_course", methods=["POST"])
-# @swag_from("swagger/courses.yml")
+@swag_from("swagger/courses.yml")
 def add_student_to_course() -> wrappers.Response:
     with get_session() as session:
         data = request.get_json()
@@ -85,7 +85,7 @@ def add_student_to_course() -> wrappers.Response:
 
 # Remove the student from one of his or her courses
 @routes.route("/students/<int:student_id>/courses", methods=["DELETE"])
-# @swag_from("swagger/courses.yml")
+@swag_from("swagger/courses.yml")
 def delete_course(student_id: int) -> wrappers.Response:
     with get_session() as session:
         course_id = request.args.get("course")
@@ -106,7 +106,7 @@ def delete_course(student_id: int) -> wrappers.Response:
 
 # Find all groups with less or equals student count.
 @routes.route("/groups", methods=["GET"])
-# @swag_from("swagger/groups.yml")
+@swag_from("swagger/groups.yml")
 def get_groups() -> wrappers.Response:
     with get_session() as session:
         max_students = request.args.get("max_students")

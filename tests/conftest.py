@@ -7,6 +7,7 @@ from src.database.models import (
     StudentCourseModel,
     GroupModel,
 )
+
 from src.database.connection import db
 from sqlalchemy.orm import Session
 
@@ -30,6 +31,7 @@ def app():
         student_course = StudentCourseModel(student_id=2, course_id=1)
         session.add(student_course)
         session.flush()
+        session.commit()
         yield app
         db.drop_all()
 

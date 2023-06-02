@@ -11,9 +11,6 @@ class GetIdsStudentAndCourse(TypedDict):
 
 
 class StudentCourseRepository(BaseRepository):
-    def add_course_id(student_id: int, course_id: int) -> StudentCourseModel:
-        return StudentCourseModel(student_id=student_id, course_id=course_id)
-
     def get_an_existing_course_from_the_student(
         self, data: GetIdsStudentAndCourse
     ) -> List[int]:
