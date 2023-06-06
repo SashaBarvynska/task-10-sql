@@ -1,39 +1,41 @@
 import pytest
-from src.app import create_app
-import config
-from src.database.models import (
-    StudentModel,
-    CourseModel,
-    StudentCourseModel,
-    GroupModel,
-)
+import sys, os
 
-from src.database.connection import db
+sys.path.append(os.getcwd())
+from tests.helpers import add_data_to_db, delete_data_from_db
+
+from src.app import create_app
+from config import TestConfig
+from sqlalchemy.sql import text
+from src.database.connection import db as _db
 from sqlalchemy.orm import Session
 
 
-@pytest.fixture()
+@pytest.fixture(scope="session")
 def app():
-    app = create_app(config.TestConfig)
+    app = create_app(TestConfig)
+    ctx = app.app_context()
+    ctx.push()
+    yield app
+    ctx.pop()
+
+
+@pytest.fixture(scope="session")
+def db(app):
     with app.app_context():
-        db.create_all()
-        session: Session = db.session
-        group = GroupModel(id=1, name="AA")
-        session.add(group)
-        session.flush()
-        student = StudentModel(id=2, first_name="John", last_name="Doe", group_id=1)
-        course_1 = CourseModel(id=1, name="Biology")
-        course_2 = CourseModel(id=2, name="Math")
-        session.add(student)
-        session.add(course_1)
-        session.add(course_2)
-        session.flush()
-        student_course = StudentCourseModel(student_id=2, course_id=1)
-        session.add(student_course)
-        session.flush()
-        session.commit()
-        yield app
-        db.drop_all()
+        _db.create_all()
+        yield _db
+        _db.drop_all()
+
+
+@pytest.fixture(scope="function")
+def session(app, db):
+    session: Session = db.session
+    session.execute(text("ALTER SEQUENCE students_id_seq RESTART;"))
+    add_data_to_db(session)
+    yield session
+    delete_data_from_db(session)
+    session.close()
 
 
 @pytest.fixture()

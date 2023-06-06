@@ -3,7 +3,7 @@ from src.database.connection import db
 from src.database.models import StudentModel, StudentCourseModel, CourseModel
 
 
-data = {"first_name": "Susana", "last_name": "Bekirova"}
+test_student = {"first_name": "Susana", "last_name": "Bekirova"}
 
 
 def valid_format_of_data(data):
@@ -12,50 +12,41 @@ def valid_format_of_data(data):
     ]
 
 
-def test_create_student(app):
-    repo = StudentRepository(db.session)
-    test_input = repo.create_student(data)
-    expected_data = (
-        db.session.query(StudentModel.id).filter(StudentModel.id == 1).first()
-    )
-    db.session.close()
+def test_create_student(app, session):
+    repo = StudentRepository(session)
+    test_input = repo.create_student(test_student)
+    expected_data = session.query(StudentModel.id).filter(StudentModel.id == 1).first()
     assert test_input.id == expected_data.id
 
 
-def test_get_student_by_id(app):
-    repo = StudentRepository(db.session)
+def test_get_student_by_id(app, session):
+    repo = StudentRepository(session)
     result = repo.get_student_by_id(2)
-    db.session.close()
     assert result.id == 2
 
 
-def test_delete_student_by_id(app):
-    repo = StudentRepository(db.session)
+def test_delete_student_by_id(app, session):
+    repo = StudentRepository(session)
     repo.delete_student_by_id(2)
-    expected_data = (
-        db.session.query(StudentModel.id).filter(StudentModel.id == 2).first()
-    )
-    db.session.close()
+    expected_data = session.query(StudentModel.id).filter(StudentModel.id == 2).first()
     assert expected_data is None
 
 
-def test_get_students_related_to_course(app):
-    repo = StudentRepository(db.session)
+def test_get_students_related_to_course(app, session):
+    repo = StudentRepository(session)
     test_input = repo.get_students_related_to_course("Biology")
     expected_data = (
-        db.session.query(StudentModel)
+        session.query(StudentModel)
         .join(StudentCourseModel)
         .join(CourseModel)
         .filter(StudentCourseModel.course_id == 1)
         .first()
     )
-    db.session.close()
     assert test_input[0].id == expected_data.id
 
 
-def test_get_all_students(app):
-    expected_data = db.session.query(StudentModel).all()
-    repo = StudentRepository(db.session)
+def test_get_all_students(app, session):
+    expected_data = session.query(StudentModel).all()
+    repo = StudentRepository(session)
     test_input = repo.get_all_students()
-    db.session.close()
     assert valid_format_of_data(test_input) == valid_format_of_data(expected_data)

@@ -16,6 +16,7 @@ class StudentRepository(BaseRepository):
             first_name=data["first_name"],
             last_name=data["last_name"],
         )
+
         self.session.add(student)
         self.session.flush()
         return student

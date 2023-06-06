@@ -2,7 +2,7 @@ import random
 
 from sqlalchemy.orm import Session as Session_type
 
-from logging_config import logging
+from src.cli.logging_config import logging
 from src.database.connection import db, get_session
 from src.database.models import (
     CourseModel,

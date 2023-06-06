@@ -4,7 +4,7 @@ from src.dataclass import Student, Group
 import jsonpickle
 
 from flasgger import swag_from
-from flask import request, wrappers, current_app, Blueprint, render_template
+from flask import request, wrappers, Blueprint
 
 from src.database.repositories import (
     StudentRepository,
@@ -29,7 +29,7 @@ def add_student() -> wrappers.Response:
 
 # Delete student by STUDENT_ID
 @routes.route("/students/<int:student_id>", methods=["DELETE"])
-@swag_from("swagger/students.yml")
+@swag_from("swagger/students.yml")  #  apidocs
 def delete_student(student_id: int) -> wrappers.Response:
     with get_session() as session:
         student_repository = StudentRepository(session)
