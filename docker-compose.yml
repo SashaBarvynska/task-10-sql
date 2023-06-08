@@ -12,6 +12,8 @@ services:
       - 5008:5008
     volumes:
       - .:/app
+    env_file:
+      - ./.env
     depends_on:
       - main_db
       - test_db
@@ -25,11 +27,11 @@ services:
       POSTGRES_PASSWORD: 0672934823a
       POSTGRES_DB: postgres
     ports:
-      - 5432:5432
+      - 5433:5432
     networks:
       - my-network
     volumes:
-      - ./postgres-data/postgres:/var/lib/postgresql/data
+      - /var/lib/postgresql/data
   test_db:
     container_name: test_db
     restart: always
@@ -43,7 +45,7 @@ services:
     networks:
       - my-network
     volumes:
-      - ./postgres-data/postgres:/var/lib/postgresql/test_data
+      - /var/lib/postgresql/test_data
 
 volumes:
   postgres-data: {}
