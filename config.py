@@ -1,16 +1,13 @@
 import os
-from dotenv.main import load_dotenv
-
-load_dotenv()
 
 
 class Config:
-    SQLALCHEMY_DATABASE_URI = os.environ["DATABASE"]
-    PORT = os.environ["APP_PORT"]
-    HOST = os.environ["APP_HOST"]
-    DEBUG = os.environ.get("debug", True)
+    SQLALCHEMY_DATABASE_URI = os.getenv("DATABASE")
+    PORT = os.getenv("APP_PORT")
+    HOST = os.getenv("APP_HOST")
+    DEBUG = os.getenv("debug", True)
 
 
 class TestConfig(Config):
-    SQLALCHEMY_DATABASE_URI = os.environ["TEST_DATABASE"]
-    TESTING = os.environ.get("debug", True)
+    SQLALCHEMY_DATABASE_URI = os.getenv("TEST_DATABASE")
+    TESTING = os.getenv("debug", True)

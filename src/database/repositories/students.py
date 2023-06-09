@@ -1,6 +1,11 @@
 from typing import List, TypedDict
 
-from src.database.models import CourseModel, StudentCourseModel, StudentModel
+from src.database.models import (
+    CourseModel,
+    StudentCourseModel,
+    StudentModel,
+    GroupModel,
+)
 
 from .base_repository import BaseRepository
 
@@ -31,14 +36,22 @@ class StudentRepository(BaseRepository):
     def delete_student_by_id(self, student_id: int) -> None:
         self.session.query(StudentModel).filter(StudentModel.id == student_id).delete()
 
-    def get_students_related_to_course(self, name_course: str) -> List[StudentModel]:
+    def get_students_related_to_course(self, course_id: int) -> List[StudentModel]:
         return (
             self.session.query(StudentModel)
             .join(StudentCourseModel)
             .join(CourseModel)
-            .filter(CourseModel.name == name_course)
+            .filter(CourseModel.id == course_id)
             .all()
         )
 
     def get_all_students(self) -> list[StudentModel]:
         return self.session.query(StudentModel).all()
+
+    def get_students_by_group_id(self, group_id) -> list[StudentModel]:
+        return (
+            self.session.query(StudentModel)
+            .join(GroupModel)
+            .filter(GroupModel.id == group_id)
+            .all()
+        )

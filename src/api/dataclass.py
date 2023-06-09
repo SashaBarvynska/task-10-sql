@@ -12,3 +12,10 @@ class Student:
 class Group:
     id: int
     name: str
+
+
+@dataclass
+class Course:
+    id: int
+    name: str
+    description: str

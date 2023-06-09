@@ -1,14 +1,39 @@
 from src.database.repositories.groups import GroupRepository
-from src.database.connection import db
 from src.database.models import GroupModel
 
 
-def valid_format_of_data(data):
-    return [{"id": i.id, "name": i.name} for i in data]
-
-
-def test_get_groups_with_max_students(app, session):
-    expected_data = session.query(GroupModel).all()
+def test_get_groups(app, session):
     repo = GroupRepository(session)
-    test_input = repo.get_groups_with_max_students(23)
-    assert valid_format_of_data(test_input) == valid_format_of_data(expected_data)
+    result = repo.get_groups()
+    expected_data = session.query(GroupModel).all()
+    assert result == expected_data
+
+
+def test_get_groups_max_student(app, session):
+    repo = GroupRepository(session)
+    result = repo.get_groups(4)
+    expected_data = [session.query(GroupModel).first()]
+    assert result == expected_data
+
+
+def test_create_group(app, session):
+    repo = GroupRepository(session)
+    result = repo.create_group("Group_1")
+    expected_data = (
+        session.query(GroupModel).filter(GroupModel.name == result.name).first()
+    )
+    assert result == expected_data
+
+
+def test_get_group_by_id(app, session):
+    repo = GroupRepository(session)
+    result = repo.get_group_by_id(2)
+    expected_data = session.query(GroupModel).filter(GroupModel.id == result.id).first()
+    assert result == expected_data
+
+
+def test_delete_group_by_id(app, session):
+    repo = GroupRepository(session)
+    result = repo.delete_group_by_id(3)
+    expected_data = session.query(GroupModel).filter(GroupModel.id == 3).first()
+    assert result is expected_data

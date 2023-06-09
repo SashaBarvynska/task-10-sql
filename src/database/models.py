@@ -1,6 +1,5 @@
 from peewee import Model
-from sqlalchemy import Column, ForeignKey, Integer, String
-from sqlalchemy.orm import relationship
+from sqlalchemy import ForeignKey, Integer, String
 
 from src.database.connection import db
 

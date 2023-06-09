@@ -32,6 +32,8 @@ def db(app):
 def session(app, db):
     session: Session = db.session
     session.execute(text("ALTER SEQUENCE students_id_seq RESTART;"))
+    session.execute(text("ALTER SEQUENCE courses_id_seq RESTART;"))
+    session.execute(text("ALTER SEQUENCE groups_id_seq RESTART;"))
     add_data_to_db(session)
     yield session
     delete_data_from_db(session)

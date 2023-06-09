@@ -13,7 +13,8 @@ def get_session():
     try:
         yield session
         session.commit()
-    except DatabaseError:
+    except DatabaseError as error:
         session.rollback()
+        raise error
     finally:
         session.close()

@@ -1,15 +1,14 @@
 from flask_restful import Resource
-from flask import Flask, request
+from flask import request
 from http import HTTPStatus
 from flask import wrappers
 from src.database.repositories import StudentRepository
 from src.database.connection import get_session
-from flask_restful import Api
 from dataclasses import asdict
-from src.dataclass import Student
+from src.api.dataclass import Student
 
 
-class StudentsListAPI(Resource):
+class StudentsListApi(Resource):
     def post(self):
         with get_session() as session:
             data = request.get_json()
@@ -34,7 +33,7 @@ class StudentsListAPI(Resource):
             return dict_students, HTTPStatus.OK
 
 
-class StudentAPI(Resource):
+class StudentApi(Resource):
     def get(self, student_id: int) -> wrappers.Response:
         with get_session() as session:
             student_repository = StudentRepository(session)
