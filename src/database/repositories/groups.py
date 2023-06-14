@@ -9,7 +9,8 @@ class GroupRepository(BaseRepository):
         query = self.session.query(GroupModel)
         if max_students:
             query = (
-                query.join(StudentModel, StudentModel.group_id == GroupModel.id)
+                query.join(StudentModel)
+                .filter(GroupModel.id == StudentModel.group_id)
                 .group_by(GroupModel.id)
                 .having(func.count(StudentModel.id) <= max_students)
             )

@@ -1,11 +1,6 @@
 from typing import List, TypedDict
 
-from src.database.models import (
-    CourseModel,
-    StudentCourseModel,
-    StudentModel,
-    GroupModel,
-)
+from src.database.models import CourseModel, StudentModel, StudentCourseModel
 
 from .base_repository import BaseRepository
 
@@ -26,6 +21,10 @@ class StudentRepository(BaseRepository):
         self.session.flush()
         return student
 
+    def patch_student(self, student: StudentModel, kwargs: dict[str, str]) -> None:
+        student.first_name = kwargs["first_name"]
+        student.last_name = kwargs["last_name"]
+
     def get_student_by_id(self, student_id: int) -> StudentModel or None:
         return (
             self.session.query(StudentModel)
@@ -40,8 +39,7 @@ class StudentRepository(BaseRepository):
         return (
             self.session.query(StudentModel)
             .join(StudentCourseModel)
-            .join(CourseModel)
-            .filter(CourseModel.id == course_id)
+            .filter(StudentCourseModel.course_id == course_id)
             .all()
         )
 
@@ -51,7 +49,6 @@ class StudentRepository(BaseRepository):
     def get_students_by_group_id(self, group_id) -> list[StudentModel]:
         return (
             self.session.query(StudentModel)
-            .join(GroupModel)
-            .filter(GroupModel.id == group_id)
+            .filter(StudentModel.group_id == group_id)
             .all()
         )

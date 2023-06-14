@@ -1,5 +1,4 @@
 from flask import Flask
-
 from flask_restful import Api
 from src.api.students import StudentApi, StudentsListApi
 from src.api.courses import (
@@ -10,10 +9,11 @@ from src.api.courses import (
 )
 from src.api.groups import GroupsListApi, GroupApi
 
+api: Api
+
 
 def init_api(app: Flask):
     api = Api(app)
-
     # students
     api.add_resource(StudentsListApi, "/students")
     api.add_resource(StudentApi, "/students/<int:student_id>")

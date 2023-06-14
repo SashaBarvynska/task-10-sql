@@ -12,6 +12,15 @@ def test_create_student(app, session):
     assert test_input.id == expected_data.id
 
 
+def test_patch_student(app, session):
+    student = StudentRepository(session).get_student_by_id(2)
+    repo = StudentRepository(session)
+    data = {"first_name": "Sasha", "last_name": "Barvynska"}
+    repo.patch_student(student, data)
+    expected_data = session.query(StudentModel).filter(StudentModel.id == 2).first()
+    assert expected_data.first_name == "Sasha"
+
+
 def test_get_student_by_id(app, session):
     repo = StudentRepository(session)
     result = repo.get_student_by_id(2)
@@ -29,13 +38,11 @@ def test_get_students_related_to_course(app, session):
     repo = StudentRepository(session)
     test_input = repo.get_students_related_to_course(2)
     expected_data = (
-        session.query(StudentModel)
-        .join(StudentCourseModel)
-        .join(CourseModel)
+        session.query(StudentCourseModel)
         .filter(StudentCourseModel.course_id == 2)
         .first()
     )
-    assert test_input[0].id == expected_data.id
+    assert test_input[0].id == expected_data.student_id
 
 
 def test_get_all_students(app, session):

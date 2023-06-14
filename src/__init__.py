@@ -1,5 +1,4 @@
 from .database import (
-    MODELS,
     CourseModel,
     GroupModel,
     GroupRepository,

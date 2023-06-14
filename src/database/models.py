@@ -1,4 +1,3 @@
-from peewee import Model
 from sqlalchemy import ForeignKey, Integer, String
 
 from src.database.connection import db
@@ -37,6 +36,3 @@ class StudentCourseModel(db.Model):
     course_id = db.Column(
         Integer, ForeignKey("courses.id", ondelete="CASCADE"), primary_key=True
     )
-
-
-MODELS: list[Model] = [GroupModel, StudentModel, CourseModel, StudentCourseModel]

@@ -1,6 +1,5 @@
 from flask_restful import Resource
 
-from flask import request
 from http import HTTPStatus
 from src.database.repositories import (
     StudentCourseRepository,
@@ -10,11 +9,26 @@ from src.database.repositories import (
 from src.database.connection import get_session
 from flask import wrappers
 from dataclasses import asdict
-from src.api.dataclass import Student, Course
+from src.api.dataclass import StudentDataclass, CourseDataclass
+from src.swagger.courses import (
+    StudentsIdSchema,
+    CourseNotFoundSchema,
+    CourseRequestSchema,
+    CourseResponseSchema,
+    DeleteCourseSchema,
+    AddCourseRequestSchema,
+    DeleteCourseStudentSchema,
+    AddCourseStudentRequestSchema,
+)
+from src.api.students import StudentResponseSchema
+from flask_apispec import marshal_with, doc, use_kwargs
+from flask_apispec.views import MethodResource
 
 
-# delete a student from the course
-class CourseStudentApi(Resource):
+class CourseStudentApi(MethodResource, Resource):
+    @doc(description="Delete course to student", tags=["Courses"])
+    @marshal_with(DeleteCourseStudentSchema, code=200)
+    @marshal_with(CourseNotFoundSchema, code=404)
     def delete(self, course_id, student_id) -> wrappers.Response:
         with get_session() as session:
             student_course_repository = StudentCourseRepository(session)
@@ -23,88 +37,118 @@ class CourseStudentApi(Resource):
             )
             if not course:
                 return {
-                    "error": f"Course by id {course_id} not found."
+                    "error": f"Student with id {student_id} is not assigned to course with id {course_id}"
                 }, HTTPStatus.NOT_FOUND
             else:
                 student_course_repository.delete_course_to_student_by_id(course)
             return {
-                "message": f"Course by id {course.course_id} has been deleted."
+                "message": f"Course by id {course_id} has been deleted from student with id {student_id}."
             }, HTTPStatus.OK
 
 
-class CourseStudentListAPI(Resource):
-    # get all students in the course
+class CourseStudentListAPI(MethodResource, Resource):
+    @doc(description="Get all students in the course", tags=["Courses"])
+    @marshal_with(CourseNotFoundSchema, code=404)
+    @marshal_with(StudentResponseSchema(many=True), code=200)
     def get(self, course_id) -> wrappers.Response:
         with get_session() as session:
+            course_repository = CourseRepository(session)
+            course = course_repository.get_course_by_id(course_id)
+            if not course:
+                return {
+                    "error": f"Course by id {course_id} not found."
+                }, HTTPStatus.NOT_FOUND
             students = StudentRepository(session).get_students_related_to_course(
                 course_id
             )
             dict_students = list(
                 map(
-                    lambda student: asdict(
-                        Student(student.id, student.first_name, student.last_name)
-                    ),
+                    lambda student: asdict(StudentDataclass.from_sqlalchemy(student)),
                     students,
                 )
             )
             return dict_students, HTTPStatus.OK
 
-    #  add a student to the course
-    def post(self, course_id) -> wrappers.Response:
+    @doc(description="Add a student to the course", tags=["Courses"])
+    @use_kwargs(StudentsIdSchema)
+    @marshal_with(CourseNotFoundSchema, code=404)
+    @marshal_with(AddCourseStudentRequestSchema, code=200)
+    def post(self, course_id, **kwargs) -> wrappers.Response:
         with get_session() as session:
-            data = request.get_json()
-            student_id = data["student_id"]
-            student_course_repository = StudentCourseRepository(session)
-            course_id_exist = (
-                student_course_repository.get_an_existing_course_from_the_student(
-                    course_id, student_id
-                )
-            )
-            if course_id_exist:
+            course_repository = CourseRepository(session)
+            course = course_repository.get_course_by_id(course_id)
+            if not course:
                 return {
-                    "error": f"This course by id  {[course_id[0] for course_id in course_id_exist][0]} already exists."
+                    "error": f"Course by id {course_id} not found."
                 }, HTTPStatus.NOT_FOUND
+            student_repository = StudentRepository(session)
+            student = student_repository.get_student_by_id(kwargs["student_id"])
+            if not student:
+                return {
+                    "error": f"This student by id  {kwargs['student_id']} is not exists."
+                }, HTTPStatus.NOT_FOUND
+
+            student_course_repository = StudentCourseRepository(session)
+            course_of_student = student_course_repository.get_students_course(
+                kwargs["student_id"], course_id
+            )
+
+            if course_of_student:
+                return {
+                    "error": f"Student with id {kwargs['student_id']} is already assigned to course with id {course_id}."
+                }, HTTPStatus.NOT_FOUND
+
             else:
-                student_course_repository.add_student_to_course(course_id, student_id)
-                return {"message": "Course was added successfully."}, HTTPStatus.OK
+                student_course_repository.add_student_to_course(
+                    kwargs["student_id"], course_id
+                )
+                return {"message": "Сourse has been successfully added"}, HTTPStatus.OK
 
 
-class CoursesListApi(Resource):
-    #  get all courses
+class CoursesListApi(MethodResource, Resource):
+    @doc(description="Get all courses", tags=["Courses"])
+    @marshal_with(CourseResponseSchema(many=True), code=200)
     def get(self) -> wrappers.Response:
         with get_session() as session:
             course_repository = CourseRepository(session)
             courses = course_repository.get_all_courses()
             dict_courses = list(
                 map(
-                    lambda course: asdict(
-                        Course(course.id, course.name, course.description)
-                    ),
+                    lambda course: asdict(CourseDataclass.from_sqlalchemy(course)),
                     courses,
                 )
             )
             return dict_courses, HTTPStatus.OK
 
-    #  create a new course
-    def post(self) -> wrappers.Response:
+    @doc(description="Create new course", tags=["Courses"])
+    @use_kwargs(CourseRequestSchema)
+    @marshal_with(AddCourseRequestSchema, code=200)
+    def post(self, **kwargs) -> wrappers.Response:
         with get_session() as session:
-            data = request.get_json()
-            name_course = data["name"]
             course_repository = CourseRepository(session)
-            course_repository.create_course(name_course)
-            return {"message": "Course was created successfully."}, HTTPStatus.OK
+            course_repository.create_course(kwargs["name"])
+            return {
+                "message": f"Course with name {kwargs['name']} was created successfully."
+            }, HTTPStatus.OK
 
 
-class CourseApi(Resource):
-    # get course by id
+class CourseApi(MethodResource, Resource):
+    @doc(description="Get course by id", tags=["Courses"])
+    @marshal_with(CourseResponseSchema, code=200)
+    @marshal_with(CourseNotFoundSchema, code=404)
     def get(self, course_id):
         with get_session() as session:
             course_repository = CourseRepository(session)
             course = course_repository.get_course_by_id(course_id)
-            dict_course = asdict(Course(course.id, course.name, course.description))
-            return dict_course, HTTPStatus.OK
+            if not course:
+                return {
+                    "error": f"Course with {course_id} not found."
+                }, HTTPStatus.NOT_FOUND
+            return asdict(CourseDataclass.from_sqlalchemy(course)), HTTPStatus.OK
 
-    # delete course by id
+    @doc(description="Delete course by id", tags=["Courses"])
+    @marshal_with(DeleteCourseSchema, code=200)
+    @marshal_with(CourseNotFoundSchema, code=404)
     def delete(self, course_id: int) -> wrappers.Response:
         with get_session() as session:
             course_repository = CourseRepository(session)
