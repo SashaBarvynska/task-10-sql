@@ -5,7 +5,7 @@ load_dotenv()
 
 
 class Config:
-    SQLALCHEMY_DATABASE_URI = os.getenv("SQLALCHEMY_DATABASE_URI", None)
+    SQLALCHEMY_DATABASE_URI = os.getenv("DATABASE", None)
     PORT = os.getenv("APP_PORT", None)
     HOST = os.getenv("APP_HOST", None)
     DEBUG = os.getenv("debug", True)

@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from src.database.models import StudentModel, GroupModel, CourseModel
 
 
 @dataclass
@@ -8,7 +9,7 @@ class StudentDataclass:
     last_name: str
 
     @classmethod
-    def from_sqlalchemy(cls, obj):
+    def from_sqlalchemy(cls, obj: StudentModel):
         return cls(id=obj.id, first_name=obj.first_name, last_name=obj.last_name)
 
 
@@ -18,7 +19,7 @@ class GroupDataclass:
     name: str
 
     @classmethod
-    def from_sqlalchemy(cls, obj):
+    def from_sqlalchemy(cls, obj: GroupModel):
         return cls(id=obj.id, name=obj.name)
 
 
@@ -29,5 +30,5 @@ class CourseDataclass:
     description: str
 
     @classmethod
-    def from_sqlalchemy(cls, obj):
+    def from_sqlalchemy(cls, obj: CourseModel):
         return cls(id=obj.id, name=obj.name, description=obj.description)

@@ -4,50 +4,50 @@ services:
   web:
     container_name: web
     restart: always
+    command: bash -c "python main.py run -h 0.0.0.0"
     build: .
-    command: bash -s "python main.py run -h 0.0.0.0"
+    env_file:
+      - ./.env.docker
     networks:
       - my-network
     ports:
-      - 8000:5008
+      - 5008:5008
     volumes:
       - .:/app
-    env_file:
-      - ./.env
     depends_on:
       - main_db
-      # - test_db
+      - test_db
   main_db:
     container_name: main_db
     restart: always
     image: postgres:13-alpine
     environment:
-      - POSTGRES_USER:postgres
-      - POSTGRES_PASSWORD:0672934823a
-      - POSTGRES_DB:postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=0672934823a
+      - POSTGRES_DB=postgres
     ports:
       - 5432:5432
     networks:
       - my-network
     volumes:
       - postgres:/var/lib/postgresql/data
-  # test_db:
-  #   container_name: test_db
-  #   restart: always
-  #   image: postgres:13-alpine
-  #   environment:
-  #     POSTGRES_USER: postgres
-  #     POSTGRES_PASSWORD: 0672934823a
-  #     POSTGRES_DB: test_db
-  #   ports:
-  #     - 5431:5432
-  #   networks:
-  #     - my-network
-  #   volumes:
-  #     - /var/lib/postgresql/test_data
+  test_db:
+    container_name: test_db
+    restart: always
+    image: postgres:13-alpine
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=0672934823a
+      - POSTGRES_DB=test_db
+    ports:
+      - 5433:5432
+    networks:
+      - my-network
+    volumes:
+      - postgres:/var/lib/postgresql/test_db
 
 volumes:
-  postgres:
+  postgres: {}
 
 networks:
   my-network:
